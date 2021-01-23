@@ -1,0 +1,274 @@
+%nomencl宏包说明
+\documentclass{ctexart}
+ \usepackage[refeq,refpage]{nomencl}
+ \usepackage{geometry}
+ \usepackage{fancyhdr}
+ \usepackage{makecell}
+ \usepackage{enumitem}
+ \usepackage[dvipsnames,svgnames,table]{xcolor}
+ \usepackage{listings}
+ \usepackage{framed}
+ \usepackage{graphicx}
+ \usepackage[colorlinks,linktocpage,linkcolor=blue]{hyperref}
+ \usepackage{titletoc}
+ \usepackage{amsmath}
+ \usepackage{cprotect}
+ \usepackage{shortvrb}
+ 
+
+
+ %定义所需要的颜色
+ \definecolor{pack}{RGB}{199,49,124}		
+ \definecolor{mBackground}{RGB}{255,248,220}
+ \definecolor{maincolor}{RGB}{0,32,245}
+ 
+ \setlength\fboxsep{1.5pt}
+ 
+ \setlist[description]{font= \color{pack}\sffamily\bfseries}	%设置 descripti 的样式
+ \MakeShortVerb| 
+ \newcommand{\mcode}[1]{\noindent \caprotect \fbox{#1} 
+ }
+ 
+% \lstset{	
+% 	firstnumber=1,
+% 	frame = single,
+% 	breaklines = true,
+% 	xleftmargin=0pt,
+% 	xrightmargin=0pt,
+% 	basicstyle=\small,
+% 	showtabs=false,
+% 	tabsize=4, 
+% 	backgroundcolor=\color{mBackground},
+% 	numberstyle=\itshape,
+% 	framesep=1pt,
+% }
+
+\lstset{
+	basicstyle=\small\ttfamily,%整体格式设置
+	columns=fullflexible,%设置字符列为非等宽
+	breaklines=true,%自动换行
+	% frameround=ttff,%边框四角弧度，t则弧
+	frame=tb,%边框样式
+	backgroundcolor=\color{mBackground},%背景颜色
+	framerule=1.5pt,%边框线宽度
+	rulecolor=\color{green!30},%边框线颜色
+	% framesep=.5em,%边距
+	numbers=left,%左边显示数字
+	% numbersep=0em,
+	xleftmargin=2em,
+	keywordstyle = \color{blue},
+	identifierstyle = \color{blue!70},
+	framexleftmargin=2em,
+	numberstyle={\sffamily\footnotesize\color{teal}}
+}
+ 
+ %定义新的颜色输出
+ \newcommand{\textbl}[1]{\textbf{\textcolor{maincolor}{#1}}}      %蓝色加粗字体
+ \newcommand{\tbt}[1]{\colorbox{lightgray!70}{#1}}		%定义行内的命令显示			
+ \newcommand{\txr}[1]{\textcolor{red}{#1}}	
+ \newcommand{\txg}[1]{\textcolor{teal}{#1}}
+ 
+ %设置页面
+ \geometry{left=2.5cm,right=1.5cm,top=2.5cm,bottom=2.5cm}
+ %设置页眉页脚
+ \pagestyle{plain}
+ 
+ %设置标题样式
+ \ctexset{
+ 	section = {
+ 		format+ = \zihao{-4} \heiti \centering \color{blue},
+ 		name = {,、},
+ 		number = \chinese{section},
+ 		beforeskip = 1.0ex plus 0.2ex minus .2ex,
+ 		afterskip = 1.0ex plus 0.2ex minus .2ex,
+ 		aftername = \hspace{0pt}
+ 	},
+ 	subsection = {
+ 		format+ = \zihao{5} \heiti \raggedright,
+ 		% name={\thesubsection、},
+ 		name = {,、},
+ 		number = \arabic{subsection},
+ 		beforeskip = 1.0ex plus 0.2ex minus .2ex,
+ 		afterskip = 1.0ex plus 0.2ex minus .2ex,
+ 		aftername = \hspace{0pt}
+ 	}
+ }
+ 
+\makenomenclature
+ \begin{document}
+ 
+\title{使用 nomencl 制作术语表}	
+\date{\today} 
+\author{种田er}
+\maketitle
+ 
+\section{制作一个例子}
+
+\par 
+首先，需要将 |\makenomenclature| 放命令在你的前言里，事实上，在测试中发现放在导言区和放在正文都可以。然
+后输入一个引用的公式。而后使用 |\nomenclature{symbol}{description}| 命令列举所需要的术语，包括符号、以及描
+述，最后使用 |\printnomenclature| 命令在合适的地方打印出术语表。
+\begin{equation}
+	a=\frac{N}{A}
+\end{equation}%
+\nomenclature{$a$}{The number of angels per unit area\nomrefeq}%
+\nomenclature{$N$}{The number of angels per needle point\nomrefpage}%
+\nomenclature{$A$}{The area of the needle point}%
+The equation $\sigma = m a$%
+\nomenclature{$\sigma$}{The total mass of angels per unit area\nomrefeqpage}%
+\nomenclature{$m$}{The mass of one angel}
+
+
+\par 
+想要打印出术语表，\txr{首先在命令行切换到当前路径下，使用 pdflatex 或者 xelatex 进行一次编译}。然后会产生一个 
+\txr{*.nlo} 文件，随后在命令行中输入 |makeindex filename.nlo -s nomencel.ist -o filename.nls| 命令。此命令会根据生成的 *.nlo文件
+会生成一个  \txr{*.nls} 文件，该文件会内部会自动将术语放入 \txr{thenomenclature} 
+环境，再次编译则会预定的显示方式进行显示，例如见 公式、页数等。
+
+%nlo 文件中的代码
+\noindent \textbf{*.nlo 文件中的代码}
+\begin{lstlisting} 
+\nomenclatureentry{a$a$@[{$a$}]\begingroup The number of angels per unit area\nomrefeq\nomeqref 
+{1}|nompageref}{1}
+\nomenclatureentry{a$N$@[{$N$}]\begingroup The number of angels per needle point\nomrefpage\nomeqref 
+{1}|nompageref}{1}
+\nomenclatureentry{a$A$@[{$A$}]\begingroup The area of the needle point\nomeqref {1}|nompageref}{1}
+\nomenclatureentry{a$\sigma$@[{$\sigma$}]\begingroup The total mass of angels per unit area\nomrefeqpage\nomeqref 
+{1}|nompageref}{1}
+\nomenclatureentry{a$m$@[{$m$}]\begingroup The mass of one angel\nomeqref {1}|nompageref}{1}
+\end{lstlisting} 
+
+
+%nls文件中的代码
+\noindent \textbf{*.nls 文件中的代码}
+\begin{lstlisting}
+\begin{thenomenclature} 
+\nomgroup{A}
+\item [{$\sigma$}]\begingroup The total mass of angels per unit area\nomrefpage\nomeqref {1}\nompageref{1}
+\item [{$A$}]\begingroup The area of the needle point\nomeqref {1}\nompageref{1}
+\item [{$a$}]\begingroup The number of angels per unit area\nomrefeq\nomeqref {1}\nompageref{1}
+\item [{$m$}]\begingroup The mass of one angel\nomeqref {1}\nompageref{1}
+\item [{$N$}]\begingroup The number of angels per needle point\nomrefpage\nomeqref {1}\nompageref{1}
+\end{thenomenclature}
+\end{lstlisting}
+
+%编译的方式
+\noindent \textbf{编译的方式}
+\begin{lstlisting}
+xelatex filename
+makeindex filename.nlo -s nomencel.ist -o filename.nls
+xelatex filename
+\end{lstlisting}
+
+\section{运作方式与 Makeindex 命令}
+\subsection{运作方式}
+\par 
+事实上，|\makenomenclature| 将会引导 \LaTeX 打开一个 *.nlo 文件，并且将 |\nomenclature| 后的术语与描述以一个  
+合适的方式写如 *.nlo 文件中。
+\par 
+下一步就是调用 |Makeindex| 命令，并且将 *.nlo 作为输入文件，使用 nomencl.sty 作为样式文件，最后将 *.nls 文件
+作为输出文件。
+\par 
+有了 *.nls 文件，再次编译，即可打印出术语表，\txr{事实上，在测试中，发现只需要有了 *.nls 
+	文件再编译即可打印出术语表，并且如果打开 *.nls 文件中并且按照相应格式添加 item 
+	的话也会打印出新添加的术语，即起决定作用的是 *.nls 文件。}
+
+\subsection{Makeindex 命令}
+\par
+Makeindex 是一个运行命令行下的程序，它的功能是对 \TeX 编译程序产生的索引进行排序、归并，得到用于输出的
+索引表，其最基本的用法是
+\begin{lstlisting}
+makeindex filename.idx
+\end{lstlisting}
+这样会得到排序整理后的 filename.ind 文件，文件后缀 .idx 可以省略。关于 Makeindex 一些常用的选项
+
+\bigskip
+\begin{tabular}{rl}
+    -o \textit{<ind>}     &     设置输出文件为 \textit{<ind>}。这一项默认是输入文件的文件名加上后缀名.ind。\\
+    -s \textit{<sty>}     &		 设置格式未见为\textit{<sty>} 。这一项默认为空，格式一般以 .ist 为文件后缀。   \\
+    -t \textit{<log>}    &		设置日志文件为 \textit{<log>}。日志文件记录了 Makeindex 处理的词条汇总和错误信息。
+ \end{tabular}
+
+\noindent \txr{关于更多 makeindex 命令的 style，可以参考 《\LaTeX 入门》中的相关章节。}
+
+%主要顺序与可选选项
+\section{主要命令与可选选项}
+
+\subsection{主要命令}
+\noindent |\nomenclature[⟨prefix⟩]{⟨symbol⟩}{⟨description⟩}|
+\par 由于|\nomenclature| 的扫描方式，所以无需通过 |\protect| 方式保护脆弱命令。但也必须确保在第一个参数之前或
+在第一个参数与第二个参数之间不包含任何字符，尤其是没有换行符（即使使用$\%$）。所以
+|\nomenclature {$x$}％{描述}| 并不起作用。
+\begin{description}
+\item [prefix] 用来微调术语表的打印顺序，默认的打印顺序为按照列举的顺序按数字排列，也可按照字符或者 ASCII 
+码进行排序。我们以一个例子来看排列顺序的规则。假设我们有 |$~Ab$$~aa$, $\Ab$, $\aa$, |\\ 
+|$Ab$, $aa$, Ab, aa |这8个需要排列的术语。如果使用默认的选项，那么所有的术语都会被视作字符。并且你会得到
+|$\aa$, $\Ab$, $aa$, $Ab$, $~aa$, $~Ab$, aa, Ab| 的排列顺序。如果在加载宏包的时候加入了 noprefix 的选项，那么
+你会得到 |$Ab$, $\Ab$, $\aa$, $aa$, $~Ab$, $~aa$, aa, Ab| 的排列顺序，前 6 者被视作符号并且按照 ASCII 码进行
+排序，而对于 Ab 和 aa ，由于 A 有更小的 ASCII 码所以排序更靠前。
+\item [symbol]  是你需要列举的术语。
+\item [description] 是你需要列举术语的描述。
+\end{description}
+
+\subsection{可选选项}
+\begin{description}
+\item[refeq] 如果加入此选项，在术语表中你会看到 see eqution(number) 的样式。
+\item[norefeq] 与前者相反，无 see eqution(number) 的样式。
+\item[refpage] 如果加入此选项，在术语表中将会看到 page(number) 的样式。
+\item[norefpage] 与前者相反，无 page(number) 的样式。
+\item[prefix] 在前面的举例中已经有所讲述。
+\item[noprefix]  与前者相反。
+\item[stdsubgroups] 根据索引的含义将索引条目分成几组。
+\item[stdsubgroups] 与前者相反。
+\item[cfg] 默认情况下，nomencl.cfg 会被加载，如果存在一个另外的 cfg = filenmae 则会使用它。
+\item[nocfg] cfg 文件不会被加载。
+\item[intoc] 将术语表加入到目录中去。
+\item[notintoc]  不将术语表插入到目录中。
+\item[tocbasic] 默认选项，使用 KOMA 脚本包中的 tocbasic 宏包进行 TOC 处理。
+\item[notocbasic] 	与前者相反。
+\item[compatible] 在兼容模式下运行。较旧的 tex 
+文件可能需要选择此选项才能进行编译。在最新版本的nomencl中，命令
+|\makeglossary| 和 |\printglossary| 被替换为 |\makenomenclature|和 
+|\printnomenclature|。选择此选项将重新定义旧命令，但将失去与其他词汇表宏包的兼容性。
+\item[noncompatible] 不以兼容模式运行。
+\item[nomentbl]  以 nomentbl 样式打印术语。
+\item[nonomentbl] 与前者相反。
+\end{description}
+
+\subsection{nomentbl 样式} 
+\par 如果使用 nomentbl 样式的话，| \nomenclature| 将有四个参数，即
+\begin{lstlisting}
+\nomenclature[<prefix>]{<symbol>}{<description>}{<units>}{<note>}
+\end{lstlisting}
+前面 3 者与原来一致，包含在 siunitx 宏包的 |\si| 命令中，而 |\note| 内部添加在描述中的任意注释。
+
+%测试用的代码
+\setlength{\nomitemsep}{0.2cm}
+\renewcommand{\nomentryend}{.}
+\renewcommand{\eqdeclaration}[1]{见公式:(#1)}
+\renewcommand{\pagedeclaration}[1]{见第 (#1) 页}
+\renewcommand{\nomname}{术语表}
+\section{定制}
+
+定制主要是修改术语表与描述之间的间距，各种显示的样式。
+\begin{itemize}
+	\item 可以在 |\printnomenclature| 命令后面的方括号中加入距离可以修改术语和描述之间的距离，\txr{米制距离不
+		被允许。}
+	\item 如果不喜欢这样的样式，则需要重新定制 nomenclature 环境。
+	\item 如果想要修订术语表的名称，则可以使用，|\renewcommand{\nomname}{List of Symbols}| 命令。 
+	\item 如果想要修改各个术语项目之间的间距则需要使用 |\setlength{\nomitemsep}{space}| 命令。
+	\item 如果想要修改术语表中公式的引用样式，则可以使用 |\renewcommand{\eqdeclaration}[1]{style #1}| 命令。
+	\item 如果想要修改页码引用的样式，则可以使用 |\renewcommand{\pagedeclaration}[1]{style#1}| 命令。
+	\item 想要修改术语表的名称，则需要使用 |\renewcommand{\nomname}{name}| 命令,该格式用 section 的
+	格式进行控制，与 section 的格式相同。
+\end{itemize} 
+
+\par 更多修订方式可以参考 nomencl 宏包。
+
+\section{总结}
+想要打印出术语表，重要的是在第二步中使用命令行的 |makeindex| 命令输出一个*.nls 文件，有了此 nls 文件并且
+加入 |\printnomenclature[0.5in]| 命令再次编译就可以得到想要的术语表，当然可以在你想要的部分加入 print 命令以
+在需要的地方显示术语表。
+
+\printnomenclature[0.5in]
+\end{document}
